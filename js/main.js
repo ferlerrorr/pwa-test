@@ -477,19 +477,27 @@ function vaildateCacheIfOnline() {
 // /**
 // ## Script For handling Store Button
 //  */
-$(document).ready(function () {
-  const settings = {
-    async: true,
-    crossDomain: true,
-    url: "http://10.91.100.145:8800/api/ssd/asn/jda/loaderrlogs",
-    method: "GET",
-    headers: {
-      Accept: "*/*",
-      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-    },
-  };
 
-  $.ajax(settings).done(function (response) {
-    console.log(response);
+// Call the function to initiate the request
+const settings = {
+  method: "GET",
+  headers: {
+    Accept: "*/*",
+    "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+  },
+  mode: "no-cors", // Add this line to specify 'no-cors' mode
+};
+
+fetch("http://10.91.100.145:8800/api/ssd/asn/jda/loaderrlogs", settings)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.text();
+  })
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((error) => {
+    console.error("Error fetching data:", error);
   });
-});

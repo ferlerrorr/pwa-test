@@ -1,23 +1,24 @@
-let cacheName = "SSDQue"; //any unique name
+const cacheName = "SSDQue-v2"; // Use a versioned cache name to ensure updates are detected
 
-let filesToCache = [
-  "/que-pwa/", // your repository name , both slash are important
+const filesToCache = [
+  "/", // Cache the root URL
   "service-worker.js",
   "js/main.js",
   "js/install-handler.js",
   "js/settings.js",
+  "js/jquery.js",
   "css/style.css",
   "css/portal.css",
   "assets/icons/icon.png",
   "manifest.json",
-  // add your assets here
-  // do not add config.json here
+  // Add your assets here
+  // Do not add config.json here
 ];
 
 self.addEventListener("install", function (event) {
   event.waitUntil(
     caches.open(cacheName).then((cache) => {
-      console.log("installed successfully");
+      console.log("Service Worker: Caching files");
       return cache.addAll(filesToCache);
     })
   );
@@ -26,22 +27,23 @@ self.addEventListener("install", function (event) {
 self.addEventListener("fetch", function (event) {
   if (event.request.url.includes("clean-cache")) {
     caches.delete(cacheName);
-    console.log("Cache cleared");
+    console.log("Service Worker: Cache cleared");
+  } else {
+    event.respondWith(
+      caches.match(event.request).then(function (response) {
+        if (response) {
+          console.log("Service Worker: Serving from cache");
+          return response;
+        } else {
+          console.log(
+            "Service Worker: Not serving from cache",
+            event.request.url
+          );
+          // return fetch(event.request, { mode: "no-cors" });
+        }
+      })
+    );
   }
-  event.respondWith(
-    caches.match(event.request).then(function (response) {
-      if (response) {
-        console.log("served form cache");
-      } else {
-        console.log("Not serving from cache ", event.request.url);
-      }
-      return response || fetch(event.request);
-    })
-  );
-});
-
-self.addEventListener("fetch", function (event) {
-  event.respondWith(fetch(event.request, { mode: "no-cors" }));
 });
 
 self.addEventListener("activate", function (e) {
@@ -50,7 +52,7 @@ self.addEventListener("activate", function (e) {
       return Promise.all(
         keyList.map(function (key) {
           if (key !== cacheName) {
-            console.log("service worker: Removing old cache", key);
+            console.log("Service Worker: Removing old cache", key);
             return caches.delete(key);
           }
         })
