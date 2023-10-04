@@ -24,7 +24,6 @@ self.addEventListener("install", function (event) {
 });
 
 self.addEventListener("fetch", function (event) {
-  event.respondWith(fetch(event.request, { mode: "no-cors" }));
   if (event.request.url.includes("clean-cache")) {
     caches.delete(cacheName);
     console.log("Cache cleared");
