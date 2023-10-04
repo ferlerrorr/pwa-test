@@ -28,7 +28,6 @@ self.addEventListener("fetch", function (event) {
     caches.delete(cacheName);
     console.log("Cache cleared");
   }
-
   event.respondWith(
     caches.match(event.request).then(function (response) {
       if (response) {
@@ -39,6 +38,10 @@ self.addEventListener("fetch", function (event) {
       return response || fetch(event.request);
     })
   );
+});
+
+self.addEventListener("fetch", function (event) {
+  event.respondWith(fetch(event.request, { mode: "no-cors" }));
 });
 
 self.addEventListener("activate", function (e) {
